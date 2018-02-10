@@ -18,7 +18,9 @@
     "watch": "node cli.js test --target node --watch",
     "release": "node cli.js release --no-build",
     "release-minor": "node cli.js release --no-build --type minor",
-    "release-major": "node cli.js release --no-build --type major"
+    "release-major": "node cli.js release --no-build --type major",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "keywords": [
     "webpack",
@@ -79,7 +81,8 @@
     "update-notifier": "^2.2.0",
     "webpack": "^3.5.5",
     "webpack-merge": "^4.1.0",
-    "yargs": "^9.0.1"
+    "yargs": "^9.0.1",
+    "snyk": "^1.69.7"
   },
   "repository": {
     "type": "git",
@@ -106,5 +109,6 @@
     "chai": "^4.1.2",
     "mock-require": "^2.0.2",
     "sinon": "^4.0.1"
-  }
+  },
+  "snyk": true
 }
