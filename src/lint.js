@@ -3,6 +3,8 @@
 const CLIEngine = require('eslint').CLIEngine
 const path = require('path')
 const formatter = CLIEngine.getFormatter()
+const reallyRequire = require('really-require')
+require('colors')
 
 const CONFIG_FILE = path.resolve(__dirname, 'config', 'eslintrc.yml')
 
@@ -17,6 +19,48 @@ const FILES = [
   'benchmarks/**/*.js',
   '!**/node_modules/**'
 ]
+
+function checkDependencies () {
+  let ERROR = false
+  // let WARN = false
+
+  function warn (data) {
+    let loc = ''
+    if (data.location) {
+      loc = data.location
+      loc = ' @ ' + loc.file + ' ' + loc.from.line + ':' + loc.from.column + ' -> ' + loc.to.line + ':' + loc.to.column
+    }
+    if (data.error) {
+      ERROR = true
+      console.error('%s%s: %s'.red, 'ERROR'.bold, loc, data.message)
+    } else {
+      // WARN = true
+      console.error('%s%s: %s'.yellow, 'WARN'.bold, loc, data.message)
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    reallyRequire(process.cwd(), { sourceGlob: ['*.js', '!(node_modules|test)/**/*.js'] })
+      .then((result) => {
+        result.missing.forEach(warn)
+        result.unused.forEach(warn)
+        result.errors.forEach(err => {
+          console.error('Parser Error: %s @ %s', err.error.toString(), err.file)
+          ERROR = true
+        })
+
+        if (ERROR) {
+          return reject(new Error('Dependency errors'))
+        }
+
+        /* if (WARN) { // TODO: should this be enabled?
+          return reject(new Error('Dependency errors'))
+        } */
+
+        resolve()
+      }, reject)
+  })
+}
 
 function checkDependencyVersions () {
   const checkVersions = (type, pkg, key) => {
@@ -93,7 +137,8 @@ function runLinter (opts = {}) {
 function lint (opts) {
   return Promise.all([
     runLinter(opts),
-    checkDependencyVersions(opts)
+    checkDependencyVersions(opts),
+    checkDependencies(opts)
   ])
 }
 
