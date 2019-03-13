@@ -38,7 +38,7 @@
     "conventional-github-releaser": "^2.0.0",
     "coveralls": "^3.0.0",
     "detect-node": "^2.0.3",
-    "documentation": "^5.3.3",
+    "documentation": "^9.3.1",
     "es6-promisify": "^5.0.0",
     "eslint": "^4.13.0",
     "eslint-config-aegir": "^1.0.1",
